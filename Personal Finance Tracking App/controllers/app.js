@@ -247,10 +247,13 @@ var controller = (function (budgetCtrl, UICtrl) {
             updateBudget();
         }
     };
-
+    function clearLocalStorage() {
+        localStorage.removeItem('data');
+    }
     return {
         init: function () {
             console.log('Application has started.');
+            clearLocalStorage();
             UICtrl.displayBudget({
                 budget: 0,
                 totalInc: 0,

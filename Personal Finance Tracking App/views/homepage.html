@@ -41,16 +41,46 @@
 	</div>
 </div>
 <script>
-const signUpButton = document.getElementById('signUp');
-const signInButton = document.getElementById('signIn');
-const container = document.getElementById('container');
-signUpButton.addEventListener('click', () => {
-container.classList.add("right-panel-active");
-});
+    const users = [];
+    const signUpButton = document.getElementById('signUp');
+    const signInButton = document.getElementById('signIn');
+    const container = document.getElementById('container');
 
-signInButton.addEventListener('click', () => {
-container.classList.remove("right-panel-active");
-});
+    signUpButton.addEventListener('click', () => {
+        container.classList.add("right-panel-active");
+    });
+
+    signInButton.addEventListener('click', () => {
+        container.classList.remove("right-panel-active");
+    });
+
+    document.querySelector('.sign-up-container form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = event.target.querySelector('input[placeholder="Name"]').value;
+        const email = event.target.querySelector('input[placeholder="Email"]').value;
+        const password = event.target.querySelector('input[placeholder="Password"]').value;
+
+        users.push({ name, email, password });
+
+        localStorage.setItem('loggedInUser', JSON.stringify({ name, email }));
+        event.target.reset();
+        window.location.href = 'summary.html';
+    });
+
+    document.querySelector('.sign-in-container form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const email = event.target.querySelector('input[placeholder="Email"]').value;
+        const password = event.target.querySelector('input[placeholder="Password"]').value;
+        const user = users.find(user => user.email === email && user.password === password);
+        if (user) {
+            localStorage.setItem('loggedInUser', JSON.stringify({ name: user.name, email: user.email }));
+            alert(`Welcome back, ${user.name}!`);
+            window.location.href = 'summary.html';
+        } else {
+            alert('Invalid email or password. Try again!');
+        }
+        event.target.reset();
+    });
 </script>
 </body>
 <footer>

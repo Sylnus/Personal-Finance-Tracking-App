@@ -9,7 +9,11 @@ var Expense = function (id, description, value) {
     this.description = description;
     this.value = value;
 };
+function clearLocalStorage() {
+    localStorage.removeItem('data');
+}
 
+clearLocalStorage();
 let data = localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : {
     allItems: {
         exp: [],
@@ -88,4 +92,5 @@ var budgetController = {
             percentage: -1
         };
     }
+    
 };
