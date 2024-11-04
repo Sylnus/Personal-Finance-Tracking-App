@@ -1,103 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-       <meta charset="UTF-8">
-       <title>Personal Finance Tracking</title>
-        <link rel="stylesheet" href="homepage.css">
-    </head>
-    <body>
-<div class="container" id="container">
-    <div class="form-container sign-up-container">
-        <form id="signUpForm">
-            <h1>Create Account</h1>
-            <input type="text" placeholder="Name" required />
-            <input type="email" placeholder="Email" required />
-            <input type="password" placeholder="Password" required />
-            <button type="submit">Sign Up</button>
-        </form>
-    </div>
-    <div class="form-container sign-in-container">
-        <form id="signInForm">
-            <h1>Sign in</h1>
-            <input type="email" placeholder="Email" required />
-            <input type="password" placeholder="Password" required />
-            <button type="submit">Sign In</button>
-        </form>
-    </div>
-    <div class="overlay-container">
-        <div class="overlay">
-            <div class="overlay-panel overlay-left">
-                <h1>Welcome</h1>
-                <p>Please click the button below to sign in and continue your financial tracking journey!</p>
-                <button class="ghost" id="signIn">Sign In</button>
-            </div>
-            <div class="overlay-panel overlay-right">
-                <h1>Welcome</h1>
-                <p>To start tracking your personal financial journey click the Sign Up button below!</p>
-                <button class="ghost" id="signUp">Sign Up</button>
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css?family=Expressway:100,300,400,600" rel="stylesheet" type="text/css">
+    <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css">
+    <link type="text/css" rel="stylesheet" href="homepage.css">
+    <link rel="shortcut icon" href="logo.png" type="image/png">
+    <title>Personal Finance Tracking App</title>
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="form-container sign-up-container">
+            <form id="signUpForm">
+                <h1>Create Account</h1>
+                <input type="text" placeholder="First Name" required />
+                <input type="text" placeholder="Last Name" required />
+                <input type="email" placeholder="Email" required />
+                <input type="password" placeholder="Password" required />
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+        <div class="form-container sign-in-container">
+            <form id="signInForm">
+                <h1>Sign in</h1>
+                <input type="email" placeholder="Email" required />
+                <input type="password" placeholder="Password" required />
+                <button type="submit">Sign In</button>
+            </form>
+        </div>
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Welcome</h1>
+                    <p>Please click the button below to sign in and continue your financial tracking journey!</p>
+                    <button class="ghost" id="signIn">Sign In</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Welcome</h1>
+                    <p>To start tracking your personal financial journey click the Sign Up button below!</p>
+                    <button class="ghost" id="signUp">Sign Up</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<script>
-    const signUpButton = document.getElementById('signUp');
-    const signInButton = document.getElementById('signIn');
-    const container = document.getElementById('container');
+    <script>
+        const signUpButton = document.getElementById('signUp');
+        const signInButton = document.getElementById('signIn');
+        const container = document.getElementById('container');
 
-    signUpButton.addEventListener('click', () => {
-        container.classList.add("right-panel-active");
-    });
+        signUpButton.addEventListener('click', () => {
+            container.classList.add("right-panel-active");
+        });
 
-    signInButton.addEventListener('click', () => {
-        container.classList.remove("right-panel-active");
-    });
+        signInButton.addEventListener('click', () => {
+            container.classList.remove("right-panel-active");
+        });
 
-    document.getElementById('signUpForm').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const name = event.target.querySelector('input[placeholder="Name"]').value;
-        const email = event.target.querySelector('input[placeholder="Email"]').value;
-        const password = event.target.querySelector('input[placeholder="Password"]').value;
+        document.getElementById('signUpForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const firstName = event.target.querySelector('input[placeholder="First Name"]').value;
+            const lastName = event.target.querySelector('input[placeholder="Last Name"]').value;
+            const email = event.target.querySelector('input[placeholder="Email"]').value;
+            const password = event.target.querySelector('input[placeholder="Password"]').value;
 
-        try {
-            const response = await fetch('/api/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password })
-            });
-            const data = await response.json();
-            if (response.ok) {
-                localStorage.setItem('loggedInUser', JSON.stringify({ name: data.name, email: data.email }));
-                window.location.href = 'summary.html';
-            } else {
-                alert(data.error);
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ firstName, lastName, email, password })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    localStorage.setItem('loggedInUser', JSON.stringify({ firstName: data.firstName, lastName: data.lastName, email: data.email }));
+                    window.location.href = 'summary.html';
+                } else {
+                    alert(data.error);
+                }
+            } catch (error) {
+                alert('An error occurred. Please try again.');
             }
-        } catch (error) {
-            alert('An error occurred. Please try again.');
-        }
-    });
+        });
 
-    document.getElementById('signInForm').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const email = event.target.querySelector('input[placeholder="Email"]').value;
-        const password = event.target.querySelector('input[placeholder="Password"]').value;
+        document.getElementById('signInForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const email = event.target.querySelector('input[placeholder="Email"]').value;
+            const password = event.target.querySelector('input[placeholder="Password"]').value;
 
-        try {
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await response.json();
-            if (response.ok) {
-                localStorage.setItem('loggedInUser', JSON.stringify({ name: data.name, email: data.email }));
-                window.location.href = 'summary.html';
-            } else {
-                alert(data.error);
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+                console.log('Login response:', data);
+                if (response.ok) {
+                    localStorage.setItem('loggedInUser', JSON.stringify({ firstName: data.firstName, lastName: data.lastName, email: data.email }));
+                    window.location.href = 'summary.html';
+                } else {
+                    alert(data.error);
+                }
+            } catch (error) {
+                console.error('Error during login:', error);
+                alert('An error occurred. Please try again.');
             }
-        } catch (error) {
-            alert('An error occurred. Please try again.');
-        }
-    });
-</script>
+        });
+    </script>
 </body>
 </html>

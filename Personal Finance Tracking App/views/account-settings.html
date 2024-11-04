@@ -2,10 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Account Settings</title>
-    <link rel="stylesheet" href="account-settings.css">
+    <link href="https://fonts.googleapis.com/css?family=Expressway:100,300,400,600" rel="stylesheet" type="text/css">
+    <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css">
+    <link type="text/css" rel="stylesheet" href="account-settings.css">
 </head>
 <body>
+        <div class="navbar">
+        <div class="title">Personal Finance Tracker</div>
+        <div class="nav-buttons">
+            <button onclick="window.location.href='Summary.html'">Summary</button>
+            <button onclick="window.location.href='income-expense.html'">Income/Expense</button>
+            <button onclick="window.location.href='account-settings.html'">Profile</button>
+            <button onclick="signOut()">Sign Out</button>
+        </div>
+    </div>
 <div class="container">
     <div class="profile-pic-container">
         <img id="profile-pic" src="default-profile.jpg" alt="Profile Picture">
@@ -16,11 +26,11 @@
             <h2>Current Account Information</h2>
             <p><strong>Name:</strong> <span id="current-name">Test User</span></p>
             <p><strong>Email:</strong> <span id="current-email">test.user@example.com</span></p>
-            <p style="display: none;"><strong>Address 1:</strong> <span id="current-address1"></span></p>
-            <p style="display: none;"><strong>Address 2:</strong> <span id="current-address2"></span></p>
-            <p style="display: none;"><strong>Zip Code:</strong> <span id="current-zip"></span></p>
-            <p style="display: none;"><strong>State:</strong> <span id="current-state"></span></p>
-            <p style="display: none;"><strong>Phone Number:</strong> <span id="current-phone"></span></p>
+            <p id="current-address1-container" style="display: none;"><strong>Address 1:</strong> <span id="current-address1"></span></p>
+            <p id="current-address2-container" style="display: none;"><strong>Address 2:</strong> <span id="current-address2"></span></p>
+            <p id="current-zip-container" style="display: none;"><strong>Zip Code:</strong> <span id="current-zip"></span></p>
+            <p id="current-state-container" style="display: none;"><strong>State:</strong> <span id="current-state"></span></p>
+            <p id="current-phone-container" style="display: none;"><strong>Phone:</strong> <span id="current-phone"></span></p>
         </div>
         <div class="form-container">
             <form id="account-form" action="#">
@@ -102,6 +112,10 @@
     </div>
 </div>
 <script>
+            function signOut() {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'homepage.html';
+        }
     document.getElementById('profile-pic').addEventListener('click', function() {
         document.getElementById('profile-pic-input').click();
     });
@@ -117,63 +131,124 @@
         }
     });
 
-    function saveChanges() {
-        const firstName = document.getElementById('first-name').value;
-        const lastName = document.getElementById('last-name').value;
-        const email = document.getElementById('email').value;
-        const address1 = document.getElementById('address1').value;
-        const address2 = document.getElementById('address2').value;
-        const zip = document.getElementById('zip').value;
-        const state = document.getElementById('state').value;
-        const phone = document.getElementById('phone').value;
-
-        document.getElementById('current-name').textContent = `${firstName} ${lastName}`;
-        document.getElementById('current-email').textContent = email;
-
-        if (address1) {
-            document.getElementById('current-address1').textContent = address1;
-            document.getElementById('current-address1').parentElement.style.display = 'block';
-        } else {
-            document.getElementById('current-address1').parentElement.style.display = 'none';
+    async function fetchUserData() {
+        try {
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (!loggedInUser) {
+                window.location.href = 'homepage.html';
+                return;
+            }
+            const response = await fetch(`/api/user?email=${loggedInUser.email}`);
+            const user = await response.json();
+            if (response.ok) {
+                document.getElementById('current-name').textContent = `${user.firstName} ${user.lastName}`;
+                document.getElementById('current-email').textContent = user.email;
+                if (user.address1) {
+                    document.getElementById('current-address1').textContent = user.address1;
+                    document.getElementById('current-address1-container').style.display = 'block';
+                }
+                if (user.address2) {
+                    document.getElementById('current-address2').textContent = user.address2;
+                    document.getElementById('current-address2-container').style.display = 'block';
+                }
+                if (user.zipCode) {
+                    document.getElementById('current-zip').textContent = user.zipCode;
+                    document.getElementById('current-zip-container').style.display = 'block';
+                }
+                if (user.state) {
+                    document.getElementById('current-state').textContent = user.state;
+                    document.getElementById('current-state-container').style.display = 'block';
+                }
+                if (user.phone) {
+                    document.getElementById('current-phone').textContent = user.phone;
+                    document.getElementById('current-phone-container').style.display = 'block';
+                }
+            } else {
+                alert(user.error);
+            }
+        } catch (error) {
+            alert('An error occurred while fetching user data.');
         }
-
-        if (address2) {
-            document.getElementById('current-address2').textContent = address2;
-            document.getElementById('current-address2').parentElement.style.display = 'block';
-        } else {
-            document.getElementById('current-address2').parentElement.style.display = 'none';
-        }
-
-        if (zip) {
-            document.getElementById('current-zip').textContent = zip;
-            document.getElementById('current-zip').parentElement.style.display = 'block';
-        } else {
-            document.getElementById('current-zip').parentElement.style.display = 'none';
-        }
-
-        if (state) {
-            document.getElementById('current-state').textContent = state;
-            document.getElementById('current-state').parentElement.style.display = 'block';
-        } else {
-            document.getElementById('current-state').parentElement.style.display = 'none';
-        }
-
-        if (phone) {
-            document.getElementById('current-phone').textContent = phone;
-            document.getElementById('current-phone').parentElement.style.display = 'block';
-        } else {
-            document.getElementById('current-phone').parentElement.style.display = 'none';
-        }
-
-        document.getElementById('account-form').reset();
     }
-    document.addEventListener('DOMContentLoaded', () => {
-        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-        if (loggedInUser) {
-            document.getElementById('current-name').textContent = loggedInUser.name;
-            document.getElementById('current-email').textContent = loggedInUser.email;
+
+    document.addEventListener('DOMContentLoaded', fetchUserData);
+
+    async function saveChanges() {
+        try {
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (!loggedInUser) {
+                window.location.href = 'homepage.html';
+                return;
+            }
+
+            const updatedData = {};
+            const fields = [
+                { id: 'first-name', name: 'firstName' },
+                { id: 'last-name', name: 'lastName' },
+                { id: 'email', name: 'email' },
+                { id: 'old-password', name: 'oldPassword' },
+                { id: 'new-password', name: 'newPassword' },
+                { id: 'address1', name: 'address1' },
+                { id: 'address2', name: 'address2' },
+                { id: 'zip', name: 'zipCode' },
+                { id: 'state', name: 'state' },
+                { id: 'phone', name: 'phone' }
+            ];
+            fields.forEach(field => {
+                const value = document.getElementById(field.id).value;
+                if (value) {
+                    updatedData[field.name] = value;
+                }
+            });
+
+            const response = await fetch('/api/user/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: loggedInUser.email, ...updatedData })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                alert('Changes saved successfully!');
+                if (updatedData.firstName || updatedData.lastName) {
+                    document.getElementById('current-name').textContent = `${updatedData.firstName || ''} ${updatedData.lastName || ''}`.trim();
+                }
+                if (updatedData.email) {
+                    document.getElementById('current-email').textContent = updatedData.email;
+                }
+                if (updatedData.address1) {
+                    document.getElementById('current-address1').textContent = updatedData.address1;
+                    document.getElementById('current-address1-container').style.display = 'block';
+                }
+                if (updatedData.address2) {
+                    document.getElementById('current-address2').textContent = updatedData.address2;
+                    document.getElementById('current-address2-container').style.display = 'block';
+                }
+                if (updatedData.zipCode) {
+                    document.getElementById('current-zip').textContent = updatedData.zipCode;
+                    document.getElementById('current-zip-container').style.display = 'block';
+                }
+                if (updatedData.state) {
+                    document.getElementById('current-state').textContent = updatedData.state;
+                    document.getElementById('current-state-container').style.display = 'block';
+                }
+                if (updatedData.phone) {
+                    document.getElementById('current-phone').textContent = updatedData.phone;
+                    document.getElementById('current-phone-container').style.display = 'block';
+                }
+                fields.forEach(field => {
+                    document.getElementById(field.id).value = '';
+                });
+            } else {
+                alert('Failed to save changes.');
+            }
+        } catch (error) {
+            console.error('Error saving changes:', error);
+            alert('An error occurred while saving changes.');
         }
-    });
+    }
 </script>
 </body>
 </html>

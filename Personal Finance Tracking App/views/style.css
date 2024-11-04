@@ -15,17 +15,67 @@
 }
 
 body {
-    color: #555;
-    font-family: Open Sans;
+    color: #333;
+    font-family: 'Expressway', sans-serif;
     font-size: 16px;
     position: relative;
     height: 100vh;
     font-weight: 400;
+    background-color: #f4f4f9;
 }
 
 .right { float: right; }
 .red { color: #FF5049 !important; }
 .red-focus:focus { border: 1px solid #FF5049 !important; }
+
+/**********************************************
+*** NAVBAR
+**********************************************/
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: linear-gradient(to right, #FF4B2B, #FF416C);
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.navbar .nav-buttons {
+    display: flex;
+    align-items: center;
+}
+
+.navbar .nav-buttons button {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+.navbar .nav-buttons button:hover {
+    background: linear-gradient(135deg, #a777e3, #6e8efb);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.navbar .nav-buttons button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
 /**********************************************
 *** TOP PART
@@ -46,11 +96,11 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     color: #fff;
+    text-align: center;
 }
 
 .budget__title {
     font-size: 18px;
-    text-align: center;
     margin-bottom: 10px;
     font-weight: 300;
 }
@@ -58,7 +108,6 @@ body {
 .budget__value {
     font-weight: 300;
     font-size: 46px;
-    text-align: center;
     margin-bottom: 25px;
     letter-spacing: 2px;
 }
@@ -67,10 +116,11 @@ body {
 .budget__expenses {
     padding: 12px;
     text-transform: uppercase;
+    border-radius: 8px;
+    margin-bottom: 10px;
 }
 
 .budget__income {
-    margin-bottom: 10px;
     background-color: #28B9B5;
 }
 
@@ -82,31 +132,27 @@ body {
 .budget__expenses--text {
     float: left;
     font-size: 13px;
-    color: #444;
+    color: #fff;
     margin-top: 2px;
 }
 
 .budget__income--value,
 .budget__expenses--value {
     letter-spacing: 1px;
-    float: left;
+    float: right;
 }
 
 .budget__income--percentage,
 .budget__expenses--percentage {
-    float: left;
+    float: right;
     width: 34px;
     font-size: 11px;
     padding: 3px 0;
     margin-left: 10px;
-}
-
-.budget__expenses--percentage {
     background-color: rgba(255, 255, 255, 0.2);
     text-align: center;
     border-radius: 3px;
 }
-
 
 /**********************************************
 *** BOTTOM PART
@@ -116,12 +162,18 @@ body {
 .add {
     padding: 14px;
     border-bottom: 1px solid #e7e7e7;
-    background-color: #f7f7f7;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 20px;
 }
 
 .add__container {
     margin: 0 auto;
     text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .add__type {
@@ -206,6 +258,10 @@ h2 {
 .item {
     padding: 13px;
     border-bottom: 1px solid #e7e7e7;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .item:first-child { border-top: 1px solid #e7e7e7; }
@@ -216,12 +272,12 @@ h2 {
 }
 
 .item__value {
-    float: left;
+    float: right;
     transition: transform 0.3s;
 }
 
 .item__percentage {
-    float: left;
+    float: right;
     margin-left: 20px;
     transition: transform 0.3s;
     font-size: 11px;
@@ -243,9 +299,8 @@ h2 {
     color: #FF5049;
 }
 
-
 .item__delete {
-    float: left;
+    float: right;
 }
 
 .item__delete--btn {
@@ -266,57 +321,15 @@ h2 {
 .item:hover .item__value { transform: translateX(-20px); }
 .item:hover .item__percentage { transform: translateX(-20px); }
 
-
 .unpaid {
     background-color: #FFDAD9 !important;
     cursor: pointer;
     color: #FF5049;
-
 }
 
 .unpaid .item__percentage { box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1); }
 .unpaid:hover .item__description { font-weight: 900; }
 
-.profile-container {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    align-items: center;
-    z-index: 1000;
-}
-
-.profile-container img {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    margin-right: 10px;
-    border: 2px solid #007bff;
-}
-
-.profile-container button {
-    background: linear-gradient(135deg, #6e8efb, #a777e3);
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
-}
-
-.profile-container button:hover {
-    background: linear-gradient(135deg, #a777e3, #6e8efb);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-}
-
-.profile-container button:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
 @media only screen and (max-width: 800px), only screen and (max-device-width: 480px){
     body{
         font-size: 25px;

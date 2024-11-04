@@ -1,11 +1,14 @@
-//this file will be used to store user account creation data and password encryption
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
-    name: {
+    firstName: {
         type: String,
-        required: true
+        required: false
+    },
+    lastName: {
+        type: String,
+        required: false
     },
     email: {
         type: String,
@@ -15,16 +18,29 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    address1: {
+        type: String,
+        required: false
+    },
+    address2: {
+        type: String,
+        required: false
+    },
+    zipCode: {
+        type: String,
+        required: false
+    },
+    state: {
+        type: String,
+        required: false
+    },
+    phone: {
+        type: String,
+        required: false
     }
 });
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) {
-        return next();
-    }
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-});
+
 userSchema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
