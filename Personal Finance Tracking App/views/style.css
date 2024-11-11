@@ -157,8 +157,6 @@ body {
 /**********************************************
 *** BOTTOM PART
 **********************************************/
-
-/***** FORM *****/
 .add {
     padding: 14px;
     border-bottom: 1px solid #e7e7e7;
@@ -175,7 +173,19 @@ body {
     justify-content: center;
     align-items: center;
 }
-
+.add__category {
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-right: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s;
+}
+.add__category:focus {
+    outline: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 .add__type {
     width: 55px;
     border-radius: 5px;
@@ -229,6 +239,25 @@ body {
 .add__btn:focus { outline: none; }
 
 /***** LISTS *****/
+
+/* Delete button styling */
+.delete-btn {
+    background: none;
+    border: none;
+    color: #ff4b2b;
+    cursor: pointer;
+    font-size: 20px;
+    display: none; /* Initially hidden */
+}
+
+.card-item:hover .delete-btn {
+    display: inline; /* Show delete button on hover */
+}
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
 .container {
     width: 1000px;
     margin: 60px auto;
@@ -398,4 +427,29 @@ h2 {
     h2.expenses__title{
         font-size: 35px;
     }
+}
+/**********************************************
+*** CARDS
+**********************************************/
+
+.card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px 0;
+    transition: box-shadow 0.3s;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-item {
+    padding: 10px;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.card-item:last-child {
+    border-bottom: none;
 }

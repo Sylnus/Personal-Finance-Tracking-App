@@ -2,20 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css?family=Expressway:100,300,400,600" rel="stylesheet" type="text/css">
     <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css">
     <link type="text/css" rel="stylesheet" href="style.css">
     <link rel="shortcut icon" href="logo.png" type="image/png">
+    <title>Income/Expense</title>
 </head>
-    <body>
-        <div class="navbar">
-            <div class="title">Personal Finance Tracker</div>
-            <div class="nav-buttons">
-                <button onclick="window.location.href='Summary.html'">Summary</button>
-                <button onclick="window.location.href='income-expense.html'">Income/Expense</button>
-                <button onclick="window.location.href='account-settings.html'">Profile</button>
-                <button onclick="signOut()">Sign Out</button>
-            </div>
+<body>
+    <div class="navbar">
+        <div class="title">Personal Finance Tracker</div>
+        <div class="nav-buttons">
+            <button onclick="window.location.href='Summary.html'">Summary</button>
+            <button onclick="window.location.href='income-expense.html'">Income/Expense</button>
+            <button onclick="window.location.href='account-settings.html'">Profile</button>
+            <button onclick="signOut()">Sign Out</button>
+        </div>
     </div>
 
     <div class="bottom">
@@ -27,99 +27,151 @@
                 </select>
                 <input type="text" class="add__description" placeholder="Add description">
                 <input type="number" class="add__value" placeholder="Value">
+                <select class="add__category">
+                    <option value="salary">Salary</option>
+                    <option value="investment">Investment</option>
+                    <option value="side job">Side Job</option>
+                    <option value="business">Business</option>
+                    <option value="housing">Housing</option>
+                    <option value="utilities">Utilities</option>
+                    <option value="transportation">Transportation</option>
+                    <option value="food">Food</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="health">Health</option>
+                    <option value="education">Education</option>
+                    <option value="debt">Debt</option>
+                    <option value="savings">Savings</option>
+                    <option value="other">Other</option>
+                </select>
                 <button class="add__btn"><i class="ion-ios-checkmark-outline"></i></button>
             </div>
         </div>
         
         <div class="container clearfix">
             <div class="income">
-                <h2 class="income__title">Income</h2>
-                <div class="income__list">
-                    <ul></ul>
+                <h2 class="income__title">Income <span class="total">Total: <span id="total-income">$0.00</span></span></h2>
+                <div class="income__list card">
+                    <ul id="income-list"></ul>
                 </div>
             </div>
             
             <div class="expenses">
-                <h2 class="expenses__title">Expenses</h2>
-                <div class="expenses__list">
-                    <ul></ul>
+                <h2 class="expenses__title">Expenses <span class="total">Total: <span id="total-expenses">$0.00</span></h2>
+                <div class="expenses__list card">
+                    <ul id="expense-list"></ul>
                 </div>
             </div>
         </div>
     </div>
     
     <script>
+        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        if (!loggedInUser) {
+            window.location.href = 'homepage.html';
+        }
+        const userEmail = loggedInUser.email;
+
         let totalIncome = 0;
         let totalExpenses = 0;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-            if (!loggedInUser) {
-                window.location.href = 'homepage.html';
-                return;
+        async function fetchIncomeExpenses() {
+            try {
+                const response = await fetch(`/api/income-expense?email=${userEmail}`);
+                const data = await response.json();
+                if (response.ok) {
+                    data.incomeExpenses.forEach(item => {
+                        addItemToList(item.type, item.description, item.value, item.category, item._id);
+                    });
+                } else {
+                    console.error(data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching income/expenses:', error);
             }
+        }
 
-            const monthNames = [
-                "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-            ];
-            const now = new Date();
-            const currentMonth = monthNames[now.getMonth()];
-            document.getElementById('current-month').textContent = currentMonth;
-        });
+        function addItemToList(type, description, value, category, id) {
+            const list = type === 'inc' ? document.getElementById('income-list') : document.getElementById('expense-list');
+            const listItem = document.createElement('li');
+            listItem.className = 'card-item';
+            listItem.dataset.id = id;
+            listItem.innerHTML = `${description} (${category}): $${value.toFixed(2)} <button class="delete-btn"><i class="ion-ios-close-outline"></i></button>`;
+            list.appendChild(listItem);
 
-        document.querySelector('.add__btn').addEventListener('click', addItem);
+            if (type === 'inc') {
+                totalIncome += value;
+                document.getElementById('total-income').textContent = `$${totalIncome.toFixed(2)}`;
+            } else {
+                totalExpenses += value;
+                document.getElementById('total-expenses').textContent = `$${totalExpenses.toFixed(2)}`;
+            }
+        }
 
-        function addItem() {
+        document.querySelector('.add__btn').addEventListener('click', async function() {
             const type = document.querySelector('.add__type').value;
             const description = document.querySelector('.add__description').value;
             const value = parseFloat(document.querySelector('.add__value').value);
+            const category = document.querySelector('.add__category').value;
 
             if (description !== "" && !isNaN(value) && value > 0) {
-                const list = type === 'inc' ? document.querySelector('.income__list ul') : document.querySelector('.expenses__list ul');
-                const html = `
-                    <li class="item clearfix">
-                        <div class="item__description">${description}</div>
-                        <div class="right clearfix">
-                            <div class="item__value">${type === 'inc' ? '+' : '-'} ${value.toFixed(2)}</div>
-                            <div class="item__delete">
-                                <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
-                            </div>
-                        </div>
-                    </li>
-                `;
-                list.insertAdjacentHTML('beforeend', html);
-
-                if (type === 'inc') {
-                    totalIncome += value;
-                } else {
-                    totalExpenses += value;
+                try {
+                    console.log('Sending POST request to add income/expense');
+                    const response = await fetch('/api/income-expense', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email: userEmail, type, description, value, category })
+                    });
+                    const data = await response.json();
+                    console.log('Response from POST request:', data);
+                    if (response.ok) {
+                        addItemToList(type, description, value, category, data.incomeExpenses[data.incomeExpenses.length - 1]._id);
+                        document.querySelector('.add__description').value = '';
+                        document.querySelector('.add__value').value = '';
+                    } else {
+                        console.error(data.message);
+                    }
+                } catch (error) {
+                    console.error('Error adding income/expense:', error);
                 }
-
-                updateBudget();
-                clearFields();
+            } else {
+                console.log('Invalid input: Description or value is missing or invalid');
             }
-        }
+        });
 
-        function updateBudget() {
-            const budget = totalIncome - totalExpenses;
-            const total = totalIncome + totalExpenses;
-            const incomePercentage = total > 0 ? Math.round((totalIncome / total) * 100) : 0;
-            const expensesPercentage = total > 0 ? Math.round((totalExpenses / total) * 100) : 0;
+        document.addEventListener('click', async function(event) {
+            if (event.target.closest('.delete-btn')) {
+                const listItem = event.target.closest('.card-item');
+                const id = listItem.dataset.id;
+                const valueText = listItem.textContent.match(/\$([\d.]+)/);
+                const value = parseFloat(valueText[1]);
+                const type = listItem.parentElement.id === 'income-list' ? 'inc' : 'exp';
 
-            document.getElementById('budget-value').textContent = `${budget >= 0 ? '+' : '-'} ${Math.abs(budget).toFixed(2)}`;
-            document.getElementById('income-value').textContent = `+ ${totalIncome.toFixed(2)}`;
-            document.getElementById('income-percentage').textContent = `${incomePercentage}%`;
-            document.getElementById('expenses-value').textContent = `- ${totalExpenses.toFixed(2)}`;
-            document.getElementById('expenses-percentage').textContent = `${expensesPercentage}%`;
-        }
+                try {
+                    const response = await fetch(`/api/income-expense/${id}?email=${userEmail}`, {
+                        method: 'DELETE'
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        listItem.remove();
+                        if (type === 'inc') {
+                            totalIncome -= value;
+                            document.getElementById('total-income').textContent = `$${totalIncome.toFixed(2)}`;
+                        } else {
+                            totalExpenses -= value;
+                            document.getElementById('total-expenses').textContent = `$${totalExpenses.toFixed(2)}`;
+                        }
+                    } else {
+                        console.error(data.message);
+                    }
+                } catch (error) {
+                    console.error('Error deleting income/expense:', error);
+                }
+            }
+        });
 
-        function clearFields() {
-            document.querySelector('.add__description').value = '';
-            document.querySelector('.add__value').value = '';
-            document.querySelector('.add__description').focus();
-        }
-
+        fetchIncomeExpenses();
         function signOut() {
             localStorage.removeItem('loggedInUser');
             window.location.href = 'homepage.html';

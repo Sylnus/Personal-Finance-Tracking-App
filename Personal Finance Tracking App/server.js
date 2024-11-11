@@ -6,15 +6,18 @@ const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'views')));
+
 //routes
 app.use('/api', userRoutes);
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'homepage.html'));
 });
 
-// mongodb connection
+//mongodb
 mongoose.connect('mongodb+srv://nshukla2:itis6112Project@userdata.htivr.mongodb.net/?retryWrites=true&w=majority&appName=userData')
     .then(() => {
         console.log('Connected to MongoDB Atlas');
@@ -23,7 +26,7 @@ mongoose.connect('mongodb+srv://nshukla2:itis6112Project@userdata.htivr.mongodb.
         console.error('Error connecting to MongoDB Atlas:', error);
     });
 
-// port
+//server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

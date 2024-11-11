@@ -1,6 +1,30 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
+const incomeExpenseSchema = new mongoose.Schema({
+    type: {
+        type: String,
+        required: true,
+        enum: ['inc', 'exp']
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    value: {
+        type: Number,
+        required: true
+    },
+    category: {
+        type: String,
+        required: true
+    },
+    date: {
+        type: Date,
+        default: Date.now
+    }
+});
+
 const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
@@ -38,7 +62,8 @@ const userSchema = new mongoose.Schema({
     phone: {
         type: String,
         required: false
-    }
+    },
+    incomeExpenses: [incomeExpenseSchema]
 });
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
