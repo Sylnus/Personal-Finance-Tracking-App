@@ -46,18 +46,34 @@
                 <button class="add__btn"><i class="ion-ios-checkmark-outline"></i></button>
             </div>
         </div>
+        <div class="upload-export">
+            <input type="file" id="file-input" accept=".json">
+            <button class="add__category" onclick="uploadData()">Upload Data</button>
+            <button class="add__category" onclick="exportData()">Export Data</button>
+            <button class="add__category" onclick="saveData()">Save Data</button>
+        </div>
         
         <div class="container clearfix">
             <div class="income">
                 <h2 class="income__title">Income <span class="total">Total: <span id="total-income">$0.00</span></span></h2>
                 <div class="income__list card">
+                    <div class="list-header">
+                        <div class="header__category">Category</div>
+                        <div class="header__description">Description</div>
+                        <div class="header__value">Value</div>
+                    </div>
                     <ul id="income-list"></ul>
                 </div>
             </div>
             
             <div class="expenses">
-                <h2 class="expenses__title">Expenses <span class="total">Total: <span id="total-expenses">$0.00</span></h2>
+                <h2 class="expenses__title">Expenses <span class="total">Total: <span id="total-expenses">$0.00</span></span></h2>
                 <div class="expenses__list card">
+                    <div class="list-header">
+                        <div class="header__category">Category</div>
+                        <div class="header__description">Description</div>
+                        <div class="header__value">Value</div>
+                    </div>
                     <ul id="expense-list"></ul>
                 </div>
             </div>
@@ -91,21 +107,30 @@
         }
 
         function addItemToList(type, description, value, category, id) {
-            const list = type === 'inc' ? document.getElementById('income-list') : document.getElementById('expense-list');
-            const listItem = document.createElement('li');
-            listItem.className = 'card-item';
-            listItem.dataset.id = id;
-            listItem.innerHTML = `${description} (${category}): $${value.toFixed(2)} <button class="delete-btn"><i class="ion-ios-close-outline"></i></button>`;
-            list.appendChild(listItem);
+    const list = type === 'inc' ? document.getElementById('income-list') : document.getElementById('expense-list');
+    const listItem = document.createElement('li');
+    listItem.className = 'card-item';
+    listItem.dataset.id = id;
+    listItem.innerHTML = `
+        <div class="item__category">${category}</div>
+        <div class="item__description">${description}</div>
+        <div class="right clearfix">
+            <div class="item__value">$${value.toFixed(2)}</div>
+            <div class="item__delete">
+                <button class="delete-btn"><i class="ion-ios-close-outline"></i></button>
+            </div>
+        </div>
+    `;
+    list.appendChild(listItem);
 
-            if (type === 'inc') {
-                totalIncome += value;
-                document.getElementById('total-income').textContent = `$${totalIncome.toFixed(2)}`;
-            } else {
-                totalExpenses += value;
-                document.getElementById('total-expenses').textContent = `$${totalExpenses.toFixed(2)}`;
-            }
-        }
+    if (type === 'inc') {
+        totalIncome += parseFloat(value);
+        document.getElementById('total-income').textContent = `$${totalIncome.toFixed(2)}`;
+    } else {
+        totalExpenses += parseFloat(value);
+        document.getElementById('total-expenses').textContent = `$${totalExpenses.toFixed(2)}`;
+    }
+}
 
         document.querySelector('.add__btn').addEventListener('click', async function() {
             const type = document.querySelector('.add__type').value;
@@ -176,6 +201,110 @@
             localStorage.removeItem('loggedInUser');
             window.location.href = 'homepage.html';
         }
+
+
+        function uploadData() {
+        const fileInput = document.getElementById('file-input');
+        const file = fileInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const data = JSON.parse(event.target.result);
+                data.income.forEach(item => addItemToList('inc', item.description, item.value, item.category, item.id));
+                data.expenses.forEach(item => addItemToList('exp', item.description, item.value, item.category, item.id));
+            };
+            reader.readAsText(file);
+        } else {
+            alert('Please select a file to upload.');
+        }
+    }
+
+    function exportData() {
+        const data = {
+            income: getIncomeData(),
+            expenses: getExpenseData()
+        };
+        
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'data.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+    function getIncomeData() {
+    const incomeList = document.getElementById('income-list').children;
+    const incomeData = [];
+    for (let item of incomeList) {
+        const descriptionElement = item.querySelector('.item__description');
+        const valueElement = item.querySelector('.item__value');
+        const categoryElement = item.querySelector('.item__category');
+
+        if (descriptionElement && valueElement && categoryElement) {
+            const description = descriptionElement.textContent;
+            const value = parseFloat(valueElement.textContent.replace('$', ''));
+            const category = categoryElement.textContent;
+            incomeData.push({ description, value, category });
+        } else {
+            console.error('Missing elements in income item:', item);
+        }
+    }
+    return incomeData;
+}
+
+function getExpenseData() {
+    const expenseList = document.getElementById('expense-list').children;
+    const expenseData = [];
+    for (let item of expenseList) {
+        const descriptionElement = item.querySelector('.item__description');
+        const valueElement = item.querySelector('.item__value');
+        const categoryElement = item.querySelector('.item__category');
+
+        if (descriptionElement && valueElement && categoryElement) {
+            const description = descriptionElement.textContent;
+            const value = parseFloat(valueElement.textContent.replace('$', ''));
+            const category = categoryElement.textContent;
+            expenseData.push({ description, value, category });
+        } else {
+            console.error('Missing elements in expense item:', item);
+        }
+    }
+    return expenseData;
+}
+    async function saveData() {
+    const incomeData = getIncomeData();
+    const expenseData = getExpenseData();
+
+    console.log('Preparing to save data:', { email: userEmail, income: incomeData, expenses: expenseData });
+
+    try {
+        const response = await fetch('/api/income-expense/bulk', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: userEmail, income: incomeData, expenses: expenseData })
+        });
+
+        console.log('Response status:', response.status);
+
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (response.ok) {
+            alert('Data saved successfully!');
+        } else {
+            console.error('Error message:', data.message);
+            alert('Error saving data: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error saving data:', error);
+        alert('Error saving data: ' + error.message);
+    }
+}
     </script>
 </body>
 </html>

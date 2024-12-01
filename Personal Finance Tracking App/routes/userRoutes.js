@@ -11,5 +11,6 @@ router.get('/user', userController.getUserByEmail);
 router.post('/income-expense', incomeExpenseController.addIncomeExpense);
 router.get('/income-expense', incomeExpenseController.getIncomeExpenses);
 router.delete('/income-expense/:incomeExpenseId', incomeExpenseController.deleteIncomeExpense);
+router.post('/income-expense/bulk', incomeExpenseController.bulkAddIncomeExpense);
 
 module.exports = router;
