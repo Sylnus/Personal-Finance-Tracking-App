@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
 });
 
 //mongodb
-mongoose.connect('mongodb+srv://nshukla2:itis6112Project@userdata.htivr.mongodb.net/?retryWrites=true&w=majority&appName=userData')
+mongoose.connect('mongodb+srv://USER:PASS@userdata.htivr.mongodb.net/?retryWrites=true&w=majority&appName=userData')
     .then(() => {
         console.log('Connected to MongoDB Atlas');
     })
